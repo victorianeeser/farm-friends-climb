@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Farm Friends Asset Export</title>
+  <style>
+    :root {
+      --bg: #f6f3ee;
+      --panel: #ffffff;
+      --ink: #1d2b3a;
+      --muted: #6b7380;
+      --line: #e3ded6;
+      --accent: #e76f51;
+      --check-a: #e9e5de;
+      --check-b: #ffffff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 24px 16px 48px;
+      background: var(--bg);
+      color: var(--ink);
+      font: 14px/1.45 system-ui, -apple-system, "Helvetica Neue", sans-serif;
+    }
+    main { max-width: 1100px; margin: 0 auto; display: grid; gap: 20px; }
+    h1 { margin: 0; font-size: 22px; }
+    header p { margin: 4px 0 0; color: var(--muted); max-width: 70ch; }
+
+    .controls {
+      display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center;
+      padding: 12px 14px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    }
+    .controls label { display: flex; gap: 8px; align-items: center; color: var(--muted); }
+    select, button { font: inherit; }
+    select { padding: 4px 6px; border-radius: 6px; border: 1px solid var(--line); background: #fff; color: var(--ink); }
+    button {
+      padding: 7px 14px; border: 0; border-radius: 999px; background: var(--accent); color: #fff; font-weight: 600; cursor: pointer;
+    }
+    button:focus-visible, select:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+    .controls .spacer { flex: 1; }
+
+    section h2 { margin: 0 0 10px; font-size: 15px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+    .card {
+      display: grid; gap: 8px; padding: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    }
+    .preview {
+      display: grid; place-items: center; height: 150px; border-radius: 6px; overflow: hidden;
+    }
+    .bg-checker .preview {
+      background-color: var(--check-b);
+      background-image:
+        linear-gradient(45deg, var(--check-a) 25%, transparent 25%, transparent 75%, var(--check-a) 75%),
+        linear-gradient(45deg, var(--check-a) 25%, transparent 25%, transparent 75%, var(--check-a) 75%);
+      background-size: 16px 16px;
+      background-position: 0 0, 8px 8px;
+    }
+    .bg-sunset .preview { background: #F3AFA0; }
+    .bg-night .preview { background: #091040; }
+    .preview canvas { max-width: 90%; max-height: 130px; image-rendering: pixelated; }
+    .meta { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+    .name { font-weight: 600; }
+    .dims { color: var(--muted); font-variant-numeric: tabular-nums; font-size: 12px; }
+    .card button { justify-self: start; }
+  </style>
+</head>
+<body>
+  <main id="app" class="bg-checker">
+    <header>
+      <h1>Farm Friends Asset Export</h1>
+      <p>Each element is drawn by the game's own rendering code, trimmed to its visible pixels, and scaled up with hard pixel edges. Downloads are PNGs with transparent backgrounds. The preview background is only for viewing and is never included in the file.</p>
+    </header>
+
+    <div class="controls">
+      <label for="scale">Export size
+        <select id="scale">
+          <option value="1">1× (game pixels)</option>
+          <option value="4">4×</option>
+          <option value="8" selected>8×</option>
+          <option value="16">16×</option>
+          <option value="32">32×</option>
+        </select>
+      </label>
+      <label for="padding">Padding
+        <select id="padding">
+          <option value="0" selected>None</option>
+          <option value="1">1 px</option>
+          <option value="2">2 px</option>
+          <option value="4">4 px</option>
+        </select>
+      </label>
+      <label for="preview-bg">Preview on
+        <select id="preview-bg">
+          <option value="checker" selected>Transparency grid</option>
+          <option value="sunset">Sunset sky</option>
+          <option value="night">Night sky</option>
+        </select>
+      </label>
+      <span class="spacer"></span>
+      <button id="download-all" type="button">Download all</button>
+    </div>
+
+    <div id="sections"></div>
+  </main>
+
+  <script type="module">
+    import { drawPlatformCloud, drawParticles } from '../js/render.js';
+    import { flyerSprite } from '../js/flyers.js';
+    import { drawGust } from '../js/gust.js';
+    import { Game, stepParticles } from '../js/game.js';
+    import { makePlatform } from '../js/level.js';
+    import { FIXED_DT } from '../js/config.js';
+
+    // Seeded random, so the particle burst looks the same every time you open this page.
+    function seeded(seed) {
+      return () => {
+        seed |= 0; seed = (seed + 0x6d2b79f5) | 0;
+        let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+
+    function burstAt(seconds) {
+      const g = new Game();
+      const random = Math.random;
+      Math.random = seeded(7);
+      g.puff(0, 0);
+      Math.random = random;
+      let list = g.particles;
+      for (let t = 0; t < seconds - 1e-9; t += FIXED_DT) list = stepParticles(list, FIXED_DT);
+      return list;
+    }
+
+    const cloud = (type) => (ctx) => drawPlatformCloud(ctx, makePlatform(type, 0, 0, 0), 20, 20);
+    const flyer = (kind, wingsUp, night = false) => (ctx) => ctx.drawImage(flyerSprite(kind, wingsUp, true, night), 20, 20);
+    const burst = (seconds) => (ctx) => drawParticles(ctx, burstAt(seconds), (y) => Math.round(y + 40));
+    const burstDraw = (seconds) => (ctx) => { ctx.save(); ctx.translate(48, 0); burst(seconds)(ctx); ctx.restore(); };
+
+    // group: frames in the same group share one trim box, so they line up as an animation.
+    const SECTIONS = [
+      { title: 'Cloud platforms', items: [
+        { id: 'cloud-normal', name: 'Normal', draw: cloud('normal') },
+        { id: 'cloud-moving', name: 'Moving', draw: cloud('moving') },
+        { id: 'cloud-breakable', name: 'Breakable', draw: cloud('breakable') },
+        { id: 'cloud-spring', name: 'Spring', draw: cloud('spring') },
+      ] },
+      { title: 'Obstacles', items: [
+        { id: 'bird-wings-up', name: 'Bird (wings up)', group: 'bird', draw: flyer('crow', true) },
+        { id: 'bird-wings-down', name: 'Bird (wings down)', group: 'bird', draw: flyer('crow', false) },
+        { id: 'bird-night-wings-up', name: 'Bird, night colors (wings up)', group: 'bird-night', draw: flyer('crow', true, true) },
+        { id: 'bird-night-wings-down', name: 'Bird, night colors (wings down)', group: 'bird-night', draw: flyer('crow', false, true) },
+        { id: 'butterfly-open', name: 'Bee (wings up)', group: 'butterfly', draw: flyer('butterfly', true) },
+        { id: 'butterfly-closed', name: 'Bee (wings down)', group: 'butterfly', draw: flyer('butterfly', false) },
+        { id: 'owl-wings-up', name: 'Owl (wings up)', group: 'owl', draw: flyer('owl', true) },
+        { id: 'owl-wings-down', name: 'Owl (wings down)', group: 'owl', draw: flyer('owl', false) },
+      ] },
+      { title: 'Wind gust', items: [
+        { id: 'wind-gust', name: 'Wind gust (still)', draw: (ctx) => drawGust(ctx, 20, 20, 0) },
+        { id: 'wind-gust-frame-1', name: 'Frame 1', group: 'gust', draw: (ctx) => drawGust(ctx, 20, 20, 0) },
+        { id: 'wind-gust-frame-2', name: 'Frame 2', group: 'gust', draw: (ctx) => drawGust(ctx, 20, 20, 0.4) },
+        { id: 'wind-gust-frame-3', name: 'Frame 3', group: 'gust', draw: (ctx) => drawGust(ctx, 20, 20, 0.8) },
+      ] },
+      { title: 'Spring launch burst', items: [
+        { id: 'burst-1-pop', name: 'Pop (0.04 s)', group: 'burst', draw: burstDraw(0.04) },
+        { id: 'burst-2-spread', name: 'Spread (0.12 s)', group: 'burst', draw: burstDraw(0.12) },
+        { id: 'burst-3-fade', name: 'Fade (0.26 s)', group: 'burst', draw: burstDraw(0.26) },
+      ] },
+    ];
+
+    const SCRATCH = 96;
+
+    function drawRaw(item) {
+      const c = document.createElement('canvas');
+      c.width = SCRATCH; c.height = SCRATCH;
+      const ctx = c.getContext('2d');
+      item.draw(ctx);
+      return c;
+    }
+
+    function alphaBounds(canvas) {
+      const { data, width, height } = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height);
+      let x0 = width, y0 = height, x1 = -1, y1 = -1;
+      for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {
+        if (data[(y * width + x) * 4 + 3] > 0) {
+          if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+        }
+      }
+      return x1 < 0 ? { x: 0, y: 0, w: 1, h: 1 } : { x: x0, y: y0, w: x1 - x0 + 1, h: y1 - y0 + 1 };
+    }
+
+    function union(a, b) {
+      const x = Math.min(a.x, b.x), y = Math.min(a.y, b.y);
+      return { x, y, w: Math.max(a.x + a.w, b.x + b.w) - x, h: Math.max(a.y + a.h, b.y + b.h) - y };
+    }
+
+    function exportCanvas(raw, box, scale, pad) {
+      const out = document.createElement('canvas');
+      out.width = (box.w + pad * 2) * scale;
+      out.height = (box.h + pad * 2) * scale;
+      const ctx = out.getContext('2d');
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(raw, box.x, box.y, box.w, box.h, pad * scale, pad * scale, box.w * scale, box.h * scale);
+      return out;
+    }
+
+    function download(canvas, filename) {
+      canvas.toBlob((blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }, 'image/png');
+    }
+
+    const $ = (id) => document.getElementById(id);
+    let exports = [];
+
+    function build() {
+      const scale = Number($('scale').value);
+      const pad = Number($('padding').value);
+      const all = SECTIONS.flatMap((s) => s.items);
+      for (const item of all) {
+        item.raw = drawRaw(item);
+        item.box = alphaBounds(item.raw);
+      }
+      const groupBox = {};
+      for (const item of all) if (item.group) groupBox[item.group] = groupBox[item.group] ? union(groupBox[item.group], item.box) : item.box;
+
+      exports = [];
+      const root = $('sections');
+      root.replaceChildren();
+      for (const section of SECTIONS) {
+        const el = document.createElement('section');
+        const h = document.createElement('h2');
+        h.textContent = section.title;
+        const grid = document.createElement('div');
+        grid.className = 'grid';
+        for (const item of section.items) {
+          const box = item.group ? groupBox[item.group] : item.box;
+          const canvas = exportCanvas(item.raw, box, scale, pad);
+          const filename = `ffc-${item.id}@${scale}x.png`;
+          exports.push({ canvas, filename });
+
+          const card = document.createElement('div');
+          card.className = 'card';
+          const preview = document.createElement('div');
+          preview.className = 'preview';
+          const shown = exportCanvas(item.raw, box, 8, pad); // preview always at 8×, scaled to fit
+          shown.setAttribute('aria-label', item.name);
+          preview.append(shown);
+          const meta = document.createElement('div');
+          meta.className = 'meta';
+          meta.innerHTML = `<span class="name"></span><span class="dims">${canvas.width} × ${canvas.height} px</span>`;
+          meta.querySelector('.name').textContent = item.name;
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.textContent = 'Download PNG';
+          btn.addEventListener('click', () => download(canvas, filename));
+          card.append(preview, meta, btn);
+          grid.append(card);
+        }
+        el.append(h, grid);
+        root.append(el);
+      }
+    }
+
+    $('scale').addEventListener('change', build);
+    $('padding').addEventListener('change', build);
+    $('preview-bg').addEventListener('change', (e) => { $('app').className = `bg-${e.target.value}`; });
+    $('download-all').addEventListener('click', async () => {
+      for (const { canvas, filename } of exports) {
+        download(canvas, filename);
+        await new Promise((r) => setTimeout(r, 300)); // browsers throttle rapid-fire downloads
+      }
+    });
+
+    build();
+  </script>
+</body>
+</html>

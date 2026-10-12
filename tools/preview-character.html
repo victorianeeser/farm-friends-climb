@@ -1,0 +1,9 @@
+<!doctype html>
+<!-- Local helper for design previews: selects the character named after "#" (e.g. #duck), then opens the home screen,
+     or the play page with "#duck:play". -->
+<meta charset="utf-8">
+<script>
+  const [id, page] = location.hash.slice(1).split(':');
+  localStorage.setItem('ffc.character', id || 'sheep');
+  location.replace(page === 'play' ? '../play.html' : '../index.html');
+</script>

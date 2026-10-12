@@ -1,0 +1,58 @@
+/* How to Play box: Figma "Game-Design" frame 179:156. Shared by the pause menu (play.html) and the ⓘ button
+   on the home screen (index.html), so both stay identical. */
+.howto-card {
+  box-sizing: border-box;
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  color: #3A2A20;
+  width: min(340px, 100% - 48px); /* ~30px of breathing room on each side of a phone screen */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 30px 32px;
+  border-radius: 24px;
+  background: #FAF7F2;
+  filter: drop-shadow(0 20px 12.5px rgba(0, 0, 0, 0.1)) drop-shadow(0 8px 5px rgba(0, 0, 0, 0.1));
+  text-align: center;
+}
+.back-link {
+  align-self: stretch;
+  font-family: inherit;
+  cursor: pointer;
+  margin: 0 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  text-align: left;
+  color: #C8C8C8;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 22.5px;
+  letter-spacing: 0.6px;
+}
+.howto-art { width: 90px; height: 63px; display: grid; place-items: center; }
+.howto-art canvas, .howto-art img { max-width: 90px; max-height: 63px; image-rendering: pixelated; }
+.howto-title {
+  margin: 0;
+  font-family: "Playfair Display", Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 26px;
+  line-height: 39px;
+}
+.howto-main { margin: 0; max-width: 254px; font-size: 15px; line-height: 24.375px; }
+.howto-main strong { font-weight: 700; }
+.howto-note { margin: 0; font-size: 13px; line-height: 19.5px; color: #856F61; }
+.howto-keys { display: flex; gap: 16px; padding-top: 8px; }
+.howto-keys span {
+  width: 112px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  border: 0.645px solid #856F61;
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 19.5px;
+  letter-spacing: 1.3px;
+}

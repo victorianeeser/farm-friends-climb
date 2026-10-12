@@ -1,0 +1,307 @@
+:root {
+  --page-bg: #FFFFFF; /* the space around the game */
+  --rotate-bg: #1d2b3a;
+  --ink: #1d2b3a;
+  --panel: rgba(255, 255, 255, 0.92);
+  --accent: #e76f51;
+  --brand-red: #8B2A3A; /* primary buttons, shared with the home screen */
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--page-bg);
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  position: fixed;
+  inset: 0;
+  font-family: system-ui, -apple-system, "Helvetica Neue", sans-serif;
+  color: var(--ink);
+}
+
+/* The real visible screen. dvh tracks mobile browser chrome showing/hiding; vh is the fallback. */
+#viewport {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* Sized and positioned by fitStage() in main.js: fills #viewport, or letterboxes for unusual shapes. */
+#stage {
+  position: absolute;
+  overflow: hidden;
+}
+
+#game {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* ---------- HUD: Figma 179:176 (Climbed) + 179:181 (pause button) ---------- */
+
+#hud {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: calc(env(safe-area-inset-top) + 16px) 16px 0;
+  pointer-events: none;
+}
+
+/* Frosted glass, shared by the score card and the pause button. */
+.climbed, .pause-btn {
+  background: rgba(255, 255, 255, 0.6);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.climbed {
+  min-width: 74.8px;
+  padding: 6px 12px;
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+}
+.climbed-label {
+  box-sizing: border-box;
+  margin: 0;
+  height: 24px;
+  padding-top: 3.6px;
+  font-size: 11px;
+  line-height: 16.5px;
+  letter-spacing: 0.275px;
+  text-transform: uppercase;
+  color: #6B4A3A;
+}
+.climbed-value {
+  margin: 0;
+  height: 28px;
+  white-space: nowrap;
+  font-family: "Playfair Display", Georgia, "Times New Roman", serif;
+  color: #3A2A20;
+}
+#hud-score {
+  font-weight: 600;
+  font-size: 22px;
+  line-height: 27.5px;
+  font-variant-numeric: lining-nums;
+}
+.climbed-unit { font-weight: 400; font-size: 13px; line-height: 16.25px; color: #8B6A5A; }
+
+.pause-btn {
+  pointer-events: auto;
+  width: 40px;
+  height: 40px;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 0;
+  cursor: pointer;
+}
+.pause-btn img { display: block; width: 12px; height: 12px; }
+.pause-btn.hidden { display: none; }
+
+/* ---------- Pause: Figma 179:144 (menu) + 179:156 (How to Play) ---------- */
+
+/* A light blur over the game: enough to set the card apart while the climb stays visible behind it. */
+.pause-layer {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 16px 4px;
+  background: rgba(58, 42, 32, 0.12);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  color: #3A2A20;
+}
+
+.pause-card {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  min-width: 189px;
+  padding: 32px;
+  border-radius: 24px;
+  background: #FAF7F2;
+  filter: drop-shadow(0 20px 12.5px rgba(0, 0, 0, 0.1)) drop-shadow(0 8px 5px rgba(0, 0, 0, 0.1));
+}
+.pause-card.hidden, .howto-card.hidden { display: none; }
+.pause-title {
+  margin: 0;
+  font-family: "Playfair Display", Georgia, serif;
+  font-style: italic;
+  font-size: 24px;
+  line-height: 36px;
+}
+.pause-layer button { font-family: inherit; cursor: pointer; }
+.pause-layer .pill {
+  margin: 0;
+  min-width: 125px;
+  padding: 15px 32px;
+  border: 0;
+  border-radius: 999px;
+  background: #8B2A3A;
+  color: #FFFFFF;
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 22.5px;
+  letter-spacing: 0.6px;
+  box-shadow: none;
+  filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.1)) drop-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
+}
+.text-link {
+  margin: 0;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  color: #6B4A3A;
+  opacity: 0.7;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.35px;
+}
+.text-link.underline { text-decoration: underline; text-underline-offset: 3px; }
+.text-link svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; }
+.text-link svg .dot { fill: currentColor; stroke: none; }
+
+
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  box-sizing: border-box;
+}
+.hidden { display: none !important; }
+
+/* ---------- Game over: styled to match the pause menu (Figma 179:144) ---------- */
+
+.over-card {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 240px;
+  padding: 32px;
+  border-radius: 24px;
+  background: #FAF7F2;
+  filter: drop-shadow(0 20px 12.5px rgba(0, 0, 0, 0.1)) drop-shadow(0 8px 5px rgba(0, 0, 0, 0.1));
+  text-align: center;
+}
+.over-card p { margin: 0; }
+.best-banner {
+  display: none;
+  margin-bottom: 6px !important;
+  font-weight: 600;
+  font-size: 11px;
+  line-height: 16.5px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #8B2A3A;
+}
+#screen-over.is-best .best-banner { display: block; }
+.over-title {
+  margin: 0;
+  font-family: "Playfair Display", Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 26px;
+  line-height: 39px;
+}
+.over-cause { margin-top: 4px !important; font-size: 13px; line-height: 19.5px; color: #856F61; }
+.over-score {
+  margin-top: 14px !important;
+  font-family: "Playfair Display", Georgia, serif;
+  white-space: nowrap;
+}
+#over-score {
+  font-weight: 600;
+  font-size: 56px;
+  line-height: 60px;
+  font-variant-numeric: lining-nums;
+}
+.over-unit { font-weight: 400; font-size: 20px; line-height: 24px; color: #8B6A5A; }
+.over-best {
+  margin-top: 4px !important;
+  font-size: 11px;
+  line-height: 16.5px;
+  letter-spacing: 0.275px;
+  text-transform: uppercase;
+  color: #6B4A3A;
+}
+.over-card .pill { margin-top: 24px; }
+.over-card .text-link { margin-top: 20px; }
+
+.countdown { pointer-events: none; }
+#countdown-number {
+  margin: 0;
+  font-family: "Playfair Display", Georgia, "Times New Roman", serif;
+  font-weight: 600;
+  font-size: 96px;
+  line-height: 1;
+  /* Dark ink rather than white: with no shadow, white would vanish into the pale sunset sky of the start. */
+  color: #3A2A20;
+  font-variant-numeric: lining-nums;
+}
+/* main.js sets the colour to the selected character's (the same as its Tap to Play button). */
+#countdown-number.go { font-style: italic; font-weight: 400; }
+#countdown-number.pop { animation: countdown-pop 0.7s ease-out; }
+@keyframes countdown-pop {
+  0% { transform: scale(1.6); opacity: 0; }
+  25% { transform: scale(1); opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0.2; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #countdown-number.pop { animation: none; }
+}
+button:disabled { opacity: 0.5; }
+
+#rotate {
+  display: none;
+  position: fixed;
+  inset: 0;
+  align-items: center;
+  justify-content: center;
+  background: var(--rotate-bg);
+  color: #fff;
+  font-size: 18px;
+  text-align: center;
+  padding: 24px;
+}
+@media (orientation: landscape) and (pointer: coarse) {
+  #rotate { display: flex; }
+}

@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#FEC98A">
+  <title>Farm Friends Climb</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap">
+  <link rel="stylesheet" href="css/home.css">
+  <link rel="stylesheet" href="css/howto.css">
+</head>
+<body>
+  <!-- Home screen: Figma "Game-Design" frame 183:721, with the background and header from frame 217:61. Leaderboard and My Stats are screens within this page. -->
+  <main class="home" id="screen-home">
+    <button type="button" class="app-back" aria-disabled="true" tabindex="-1">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      DB App
+    </button>
+    <button type="button" class="info-btn" id="info" aria-label="How to play" aria-haspopup="dialog">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle class="ring" cx="12" cy="12" r="11"/><path d="M12 10.5v6.5"/><circle cx="12" cy="7.2" r="1.25" class="dot"/></svg>
+    </button>
+
+    <header class="brand">
+      <img class="wordmark" src="assets/ui/farm-friends-wordmark.png" alt="Farm Friends" width="222" height="71">
+      <p class="eyebrow">Climb</p>
+    </header>
+
+    <div class="picker" aria-label="Choose your climber">
+      <button type="button" class="step prev" id="prev" aria-label="Previous character">
+        <img src="assets/ui/arrow-circle.svg" alt="" width="26" height="26">
+      </button>
+      <div class="pattern" id="card">
+        <div class="card" aria-live="polite">
+          <div class="art" id="art"></div>
+          <div class="card-text">
+            <p class="name" id="name"></p>
+            <p class="print" id="print"></p>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="step next" id="next" aria-label="Next character">
+        <img src="assets/ui/arrow-circle.svg" alt="" width="26" height="26">
+      </button>
+    </div>
+
+    <div class="actions">
+      <button type="button" class="pill play" id="play">Tap to Play</button>
+      <div class="actions-row">
+        <button type="button" class="pill outline" id="open-leaderboard">
+          <svg class="pill-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 5.5H5v1a3.5 3.5 0 0 0 3.2 3.5M16 5.5h3v1a3.5 3.5 0 0 1-3.2 3.5"/><path d="M12 13v4M9 20h6M9.5 17h5v3h-5z"/></svg>
+          Leaderboard
+        </button>
+        <button type="button" class="pill outline" id="open-stats">
+          <svg class="pill-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 19.5v-6M12 19.5v-14M17.5 19.5v-9"/></svg>
+          My Stats
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Home background: Figma frame 217:61 (sunset gradient + farm along the bottom). -->
+  <div class="home-bg" aria-hidden="true">
+    <div id="home-clouds"></div>
+    <img class="home-farm" src="assets/ui/home-farm.png" alt="" width="1681" height="936">
+    <canvas class="home-bee" id="home-bee" width="22" height="18"></canvas>
+    <canvas class="home-bird" id="home-bird" width="40" height="20"></canvas>
+  </div>
+
+  <!-- Leaderboard screen -->
+  <section class="subscreen" id="screen-leaderboard" aria-labelledby="leaderboard-title" hidden>
+    <button type="button" class="back" data-back>← Back</button>
+    <h1 class="sub-title" id="leaderboard-title">Leaderboard</h1>
+    <ol class="rows" id="board"></ol>
+  </section>
+
+  <!-- My Stats screen -->
+  <section class="subscreen" id="screen-stats" aria-labelledby="stats-title" hidden>
+    <button type="button" class="back" data-back>← Back</button>
+    <h1 class="sub-title" id="stats-title">My Stats</h1>
+    <div class="stats-grid">
+      <div class="stat">
+        <p class="stat-label">Top Score</p>
+        <p class="stat-value"><span id="stat-best">0</span> <span class="stat-unit">ft</span></p>
+      </div>
+      <div class="stat">
+        <p class="stat-label">Leaderboard Rank</p>
+        <p class="stat-value"><span id="stat-rank">–</span></p>
+        <p class="stat-note" id="stat-rank-note"></p>
+      </div>
+      <div class="stat">
+        <p class="stat-label">Runs Played</p>
+        <p class="stat-value"><span id="stat-runs">0</span></p>
+      </div>
+      <div class="stat">
+        <p class="stat-label">Average Run</p>
+        <p class="stat-value"><span id="stat-avg">0</span> <span class="stat-unit">ft</span></p>
+      </div>
+      <div class="stat">
+        <p class="stat-label">Total Climbed</p>
+        <p class="stat-value"><span id="stat-total">0</span> <span class="stat-unit">ft</span></p>
+      </div>
+      <div class="stat">
+        <p class="stat-label">Favorite Friend</p>
+        <div class="stat-friend" id="stat-friend"></div>
+      </div>
+      <div class="stat stat-wide">
+        <p class="stat-label">How Your Runs Ended</p>
+        <ul class="endings" id="stat-endings"></ul>
+      </div>
+    </div>
+    <!-- For looks only: sharing isn't built yet, so this does nothing when tapped. -->
+    <button type="button" class="pill play share" id="share-score" aria-disabled="true">
+      <svg class="pill-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4M8 8l4-4 4 4"/><path d="M6 11H5v9h14v-9h-1"/></svg>
+      Share your score
+    </button>
+  </section>
+
+  <!-- How to Play (same box as in the pause menu), opened by the ⓘ button. -->
+  <div class="info-layer" id="howto-layer" hidden>
+    <div class="howto-card" role="dialog" aria-modal="true" aria-labelledby="howto-title">
+      <button type="button" class="back-link" id="howto-close">← Back</button>
+      <div class="howto-art" id="howto-art"></div>
+      <h2 class="howto-title" id="howto-title">How to Play</h2>
+      <p class="howto-main">Tap the <strong>left</strong> or <strong>right</strong> side of the screen to steer your Farm Friend left or right as they bounce upward.</p>
+      <p class="howto-note">Don't fall off the platforms!<br>Avoid bees, birds, owls, &amp; wind!</p>
+      <div class="howto-keys" aria-hidden="true">
+        <span>← Left</span>
+        <span>Right →</span>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/home.js"></script>
+</body>
+</html>

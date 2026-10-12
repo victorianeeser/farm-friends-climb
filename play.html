@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#FFFFFF">
+  <title>Farm Friends Climb</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/howto.css">
+</head>
+<body>
+  <div id="viewport">
+    <div id="stage">
+      <canvas id="game"></canvas>
+
+      <!-- HUD: Figma frames 179:176 (score) and 179:181 (pause button). -->
+      <div id="hud">
+        <div class="climbed" aria-live="off">
+          <p class="climbed-label">Climbed</p>
+          <p class="climbed-value"><span id="hud-score">0</span> <span class="climbed-unit">ft</span></p>
+        </div>
+        <button type="button" class="pause-btn" id="btn-pause" aria-label="Pause">
+          <img src="assets/ui/pause-icon.svg" alt="" width="12" height="12">
+        </button>
+      </div>
+
+      <!-- Pause: Figma frames 179:144 (menu) and 179:156 (How to Play), over a light blur of the game. -->
+      <div id="screen-pause" class="pause-layer hidden">
+        <div class="pause-card" id="pause-menu" role="dialog" aria-modal="true" aria-labelledby="pause-title">
+          <p class="pause-title" id="pause-title">Paused</p>
+          <button type="button" class="pill" id="btn-resume">Resume</button>
+          <button type="button" class="text-link" id="btn-howto">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7"/><path d="M8 7.2v4.3"/><circle cx="8" cy="4.6" r="0.9" class="dot"/></svg>
+            How to Play
+          </button>
+          <button type="button" class="text-link underline" id="btn-quit">Quit to Menu</button>
+        </div>
+
+        <div class="howto-card hidden" id="howto" role="dialog" aria-modal="true" aria-labelledby="howto-title">
+          <button type="button" class="back-link" id="btn-back">← Back to Paused menu</button>
+          <div class="howto-art" id="howto-art"></div>
+          <h2 class="howto-title" id="howto-title">How to Play</h2>
+          <p class="howto-main">Tap the <strong>left</strong> or <strong>right</strong> side of the screen to steer your Farm Friend left or right as they bounce upward.</p>
+          <p class="howto-note">Don't fall off the platforms!<br>Avoid bees, birds, owls, &amp; wind!</p>
+          <div class="howto-keys" aria-hidden="true">
+            <span>← Left</span>
+            <span>Right →</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="screen-countdown" class="overlay countdown hidden" aria-live="assertive">
+        <p id="countdown-number"></p>
+      </div>
+
+      <!-- Game over: same card style and blur as the pause menu. -->
+      <div id="screen-over" class="pause-layer hidden">
+        <div class="over-card" role="dialog" aria-modal="true" aria-labelledby="over-title">
+          <p class="best-banner">New personal best!</p>
+          <h1 class="over-title" id="over-title">Game over</h1>
+          <p class="over-cause" id="over-cause"></p>
+          <p class="over-score"><span id="over-score">0</span> <span class="over-unit">ft</span></p>
+          <p class="over-best">Best <span id="over-best">0</span> ft</p>
+          <button type="button" class="pill" id="btn-restart">Play again</button>
+          <button type="button" class="text-link underline" id="btn-home">Home</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="rotate">
+    <p>Please rotate your phone to portrait.</p>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

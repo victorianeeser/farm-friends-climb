@@ -38,13 +38,9 @@ How the game handles the PNG depends on its size:
 
 Either way, the game builds a mirrored copy for facing left and measures hitboxes from the silhouette. Thin-legged characters get a landing span of at least 10px.
 
-## Asset export tool
-
-Open http://localhost:8000/tools/export.html (with `python3 serve.py` running) to download transparent PNGs of the code-drawn elements: the four cloud types, bird, bee, owl and spring-burst frames. It uses the game's own drawing code, so the exports match the game exactly. Choose the size (1×–32×) and padding at the top of the page. This is a local tool only and isn't part of the game.
-
 ## Deploy
 
-Upload `index.html`, `play.html`, `css/`, `js/` and `assets/` to any static host (GitHub Pages, Netlify, Vercel, etc.). `serve.py`, `tools/` and `.claude/` are for local development only.
+The game is hosted on GitHub Pages from the `main` branch: https://victorianeeser.github.io/farm-friends-climb/. Pushing to `main` updates it. It also runs as-is on any other static host (Netlify, Vercel, etc.); `serve.py` is for local development only.
 
 ## Layout
 

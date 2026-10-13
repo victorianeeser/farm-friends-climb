@@ -68,11 +68,10 @@ body {
   pointer-events: none;
 }
 
-/* Frosted glass, shared by the score card and the pause button. */
+/* Solid white with grey text and icon, shared by the score card and the pause button, like the home screen's
+   white buttons. */
 .climbed, .pause-btn {
-  background: rgba(255, 255, 255, 0.6);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
+  background: #FFFFFF;
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.1);
 }
@@ -91,14 +90,14 @@ body {
   line-height: 16.5px;
   letter-spacing: 0.275px;
   text-transform: uppercase;
-  color: #6B4A3A;
+  color: #A8A8A8;
 }
 .climbed-value {
   margin: 0;
   height: 28px;
   white-space: nowrap;
   font-family: "Playfair Display", Georgia, "Times New Roman", serif;
-  color: #3A2A20;
+  color: #A8A8A8;
 }
 #hud-score {
   font-weight: 600;
@@ -106,12 +105,14 @@ body {
   line-height: 27.5px;
   font-variant-numeric: lining-nums;
 }
-.climbed-unit { font-weight: 400; font-size: 13px; line-height: 16.25px; color: #8B6A5A; }
+.climbed-unit { font-weight: 400; font-size: 13px; line-height: 16.25px; color: #A8A8A8; }
 
+/* A circle, like the home screen's arrows and ⓘ button. */
 .pause-btn {
   pointer-events: auto;
   width: 40px;
   height: 40px;
+  border-radius: 50%;
   margin: 0;
   padding: 0;
   display: grid;
@@ -260,7 +261,7 @@ body {
   line-height: 16.5px;
   letter-spacing: 0.275px;
   text-transform: uppercase;
-  color: #6B4A3A;
+  color: #A8A8A8;
 }
 .over-card .pill { margin-top: 24px; }
 .over-card .text-link { margin-top: 20px; }
